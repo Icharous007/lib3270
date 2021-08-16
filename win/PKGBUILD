@@ -1,0 +1,40 @@
+# Maintainer: Perry Werneck <perry.werneck@gmail.com>
+
+pkgname=${MINGW_PACKAGE_PREFIX}-lib3270
+
+pkgver=5.2
+pkgrel=1
+pkgdesc="TN3270 Access library"
+url="https://portal.softwarepublico.gov.br/social/pw3270/"
+arch=(i686 x86_64)
+license=(GPL)
+depends=()
+makedepends=(autoconf automake make openssl-devel)
+checkdepends=()
+
+#groups=(gnome)
+
+source=(lib3270-$pkgver.tar.xz)
+sha256sums=('SKIP')
+
+provides=($pkgname)
+conflicts=($pkgname)
+
+prepare() {
+  cd lib3270-$pkgver
+  NOCONFIGURE=1 ./autogen.sh
+  ./configure --prefix=$MINGW_PREFIX
+}
+
+build() {
+  cd lib3270-$pkgver
+  make all
+}
+
+package() {
+  cd lib3270-$pkgver
+  DESTDIR="$pkgdir" make install-dev
+  install .bin/Release/lib3270.dll $MINGW_PREFIX/bin
+  dlltool --dllname lib3270.dll --input-def .bin/Release/lib3270.def --output-lib $MINGW_PREFIX/lib/lib3270.a
+}
+
